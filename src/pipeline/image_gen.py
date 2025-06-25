@@ -7,11 +7,11 @@ Each image is saved to src/assets/ and the file path is returned.
 
 import logging
 import os
-import requests
 from pathlib import Path
 from typing import Optional
 
 import openai
+import requests
 from dotenv import load_dotenv
 
 from .scene_parser import Scene

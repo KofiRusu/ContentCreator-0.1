@@ -6,19 +6,19 @@ Converts story scripts into scene images using OpenAI's GPT-4o and DALL·E 3.
 """
 
 import logging
-import sys
+
 from pathlib import Path
 from typing import List, Optional
 
 import typer
-from rich.console import Console
-from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich import print as rprint
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
 
-from pipeline.scene_parser import parse_scenes, Scene
-from pipeline.image_gen import generate_scene_image
-from pipeline.video_gen import VideoGenerator, generate_scene_video
+from src.pipeline.image_gen import generate_scene_image
+from src.pipeline.scene_parser import Scene, parse_scenes
+from src.pipeline.video_gen import VideoGenerator
 
 # Initialize CLI app and console
 app = typer.Typer(
@@ -221,12 +221,15 @@ def generate_media(
         
         rprint(f"[green]✅ Parsed {len(scenes)} scenes successfully[/green]")
         
+        # Convert scene dictionaries to Scene objects
+        scene_objects = [Scene(**scene) for scene in scenes]
+        
         if verbose:
-            for scene in scenes:
+            for scene in scene_objects:
                 rprint(f"  [cyan]Scene {scene.id}:[/cyan] {scene.title}")
         
         # Check existing assets
-        existing_assets = check_existing_assets(scenes, "image") if skip_existing else {}
+        existing_assets = check_existing_assets(scene_objects, "image") if skip_existing else {}
         existing_count = sum(existing_assets.values()) if skip_existing else 0
         
         if existing_count > 0:
@@ -239,10 +242,10 @@ def generate_media(
         with Progress(console=console) as progress:
             task = progress.add_task(
                 "Generating scene images...", 
-                total=len(scenes)
+                total=len(scene_objects)
             )
             
-            for i, scene in enumerate(scenes, 1):
+            for i, scene in enumerate(scene_objects, 1):
                 progress.update(
                     task, 
                     description=f"Processing Scene {scene.id}: {scene.title[:30]}..."
@@ -284,7 +287,7 @@ def generate_media(
         rprint("[bold green]✅ Processing Complete![/bold green]")
         
         # Display summary table
-        summary_table = create_summary_table(scenes, results, existing_assets, "image", verbose)
+        summary_table = create_summary_table(scene_objects, results, existing_assets, "image", verbose)
         console.print(summary_table)
         
         # Display statistics
@@ -374,17 +377,20 @@ def generate_videos(
             rprint("[red]❌ No scenes could be parsed from the story.[/red]")
             raise typer.Exit(1)
         
+        # Convert scene dictionaries to Scene objects
+        scene_objects = [Scene(**scene) for scene in scenes]
+        
         # Apply max_scenes limit if specified
         if max_scenes and max_scenes > 0:
-            original_count = len(scenes)
-            scenes = scenes[:max_scenes]
-            if len(scenes) < original_count:
+            original_count = len(scene_objects)
+            scene_objects = scene_objects[:max_scenes]
+            if len(scene_objects) < original_count:
                 rprint(f"[yellow]📋 Limited to first {max_scenes} scenes (total: {original_count})[/yellow]")
         
-        rprint(f"[green]✅ Parsed {len(scenes)} scenes successfully[/green]")
+        rprint(f"[green]✅ Parsed {len(scene_objects)} scenes successfully[/green]")
         
         # Check existing video assets
-        existing_videos = check_existing_assets(scenes, "video") if skip_existing else {}
+        existing_videos = check_existing_assets(scene_objects, "video") if skip_existing else {}
         existing_count = sum(existing_videos.values()) if skip_existing else 0
         
         if existing_count > 0:
@@ -393,7 +399,7 @@ def generate_videos(
         # Check for existing images if using as references
         existing_images = {}
         if use_images:
-            existing_images = check_existing_assets(scenes, "image")
+            existing_images = check_existing_assets(scene_objects, "image")
             image_count = sum(existing_images.values())
             rprint(f"[cyan]🖼️  Found {image_count} existing images to use as references[/cyan]")
         
@@ -413,10 +419,10 @@ def generate_videos(
         with Progress(console=console) as progress:
             task = progress.add_task(
                 "Generating scene videos...", 
-                total=len(scenes)
+                total=len(scene_objects)
             )
             
-            for i, scene in enumerate(scenes, 1):
+            for i, scene in enumerate(scene_objects, 1):
                 progress.update(
                     task, 
                     description=f"Processing Scene {scene.id}: {scene.title[:30]}..."
@@ -474,7 +480,7 @@ def generate_videos(
         rprint("[bold green]✅ Video Generation Complete![/bold green]")
         
         # Display summary table
-        summary_table = create_summary_table(scenes, results, existing_videos, "video", verbose)
+        summary_table = create_summary_table(scene_objects, results, existing_videos, "video", verbose)
         console.print(summary_table)
         
         # Display statistics
@@ -543,7 +549,7 @@ def generate_all(
         rprint("[cyan]🎨 Step 1: Generating scene images...[/cyan]")
         try:
             from typer.testing import CliRunner
-            runner = CliRunner()
+            # Test runner not used in final implementation
             
             # Build arguments for generate-media command
             args = [script_path]
@@ -563,15 +569,18 @@ def generate_all(
                 rprint("[red]❌ No scenes could be parsed from the story.[/red]")
                 raise typer.Exit(1)
             
+            # Convert scene dictionaries to Scene objects
+            scene_objects = [Scene(**scene) for scene in scenes]
+            
             if max_scenes and max_scenes > 0:
-                scenes = scenes[:max_scenes]
+                scene_objects = scene_objects[:max_scenes]
             
             # Generate images
-            existing_images = check_existing_assets(scenes, "image") if skip_existing else {}
+            existing_images = check_existing_assets(scene_objects, "image") if skip_existing else {}
             image_results = {}
             
-            rprint(f"[cyan]🖼️  Generating {len(scenes)} scene images...[/cyan]")
-            for scene in scenes:
+            rprint(f"[cyan]🖼️  Generating {len(scene_objects)} scene images...[/cyan]")
+            for scene in scene_objects:
                 if skip_existing and existing_images.get(scene.id, False):
                     image_results[scene.id] = "skipped"
                     continue
@@ -586,7 +595,7 @@ def generate_all(
                     rprint(f"[red]❌ Image failed for scene {scene.id}: {e}[/red]")
             
             successful_images = sum(1 for r in image_results.values() if r and r != "skipped")
-            rprint(f"[green]✅ Images complete: {successful_images}/{len(scenes)} generated[/green]")
+            rprint(f"[green]✅ Images complete: {successful_images}/{len(scene_objects)} generated[/green]")
             
         except Exception as e:
             rprint(f"[red]❌ Image generation failed: {e}[/red]")
@@ -612,11 +621,11 @@ def generate_all(
         )
         
         # Check existing videos
-        existing_videos = check_existing_assets(scenes, "video") if skip_existing else {}
+        existing_videos = check_existing_assets(scene_objects, "video") if skip_existing else {}
         video_results = {}
         
-        rprint(f"[cyan]🎬 Generating {len(scenes)} scene videos...[/cyan]")
-        for scene in scenes:
+        rprint(f"[cyan]🎬 Generating {len(scene_objects)} scene videos...[/cyan]")
+        for scene in scene_objects:
             if skip_existing and existing_videos.get(scene.id, False):
                 video_results[scene.id] = "skipped"
                 continue

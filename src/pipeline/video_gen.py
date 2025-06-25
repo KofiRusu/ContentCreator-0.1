@@ -22,7 +22,7 @@ try:
 except ImportError:
     fal_client = None
 
-from .scene_parser import Scene
+from src.pipeline.scene_parser import Scene
 
 # Load environment variables
 load_dotenv()
@@ -385,7 +385,7 @@ def generate_scene_video(scene: Scene,
 # Example usage and testing
 if __name__ == "__main__":
     from scene_parser import Scene
-    
+
     # Test scene
     test_scene = Scene(
         id=1,
