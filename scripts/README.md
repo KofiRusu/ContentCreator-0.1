@@ -1,6 +1,6 @@
 # ContentCreator Git Automation Pipeline
 
-This directory contains automated git pipeline scripts for the ContentCreator repository.
+This directory contains automated git pipeline scripts for the ContentCreator-0.1 repository.
 
 ## Overview
 
@@ -89,13 +89,13 @@ Edit the scripts directly to set your default values:
 **Bash Script (`git_pipeline.sh`):**
 ```bash
 GITHUB_USERNAME="your-github-username"
-REPO_NAME="ContentCreator"
+REPO_NAME="ContentCreator-0.1"
 BRANCH="main"
 ```
 
 **Python Script (`git_auto.py`):**
 ```python
-pipeline = GitPipeline(repo_name="ContentCreator", username="your-username")
+pipeline = GitPipeline(repo_name="ContentCreator-0.1", username="your-username")
 ```
 
 ### 2. YAML Configuration
@@ -105,7 +105,7 @@ Use `config/git_config.yml` for advanced configuration:
 git:
   repository:
     username: "your-github-username"
-    name: "ContentCreator"
+    name: "ContentCreator-0.1"
 ```
 
 ## Initial Setup
@@ -117,7 +117,7 @@ git:
    ```
 
 2. **Create GitHub Repository**:
-   - Go to GitHub and create a new repository named `ContentCreator`
+   - Go to GitHub and create a new repository named `ContentCreator-0.1`
    - Make it public or private as needed
 
 3. **Set Up Remote**:

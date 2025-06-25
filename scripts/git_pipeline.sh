@@ -6,7 +6,7 @@
 set -e  # Exit immediately if a command exits with a non-zero status
 
 # Configuration
-REPO_NAME="ContentCreator"
+REPO_NAME="ContentCreator-0.1"
 GITHUB_USERNAME=""  # Set this to your GitHub username
 REMOTE_URL=""       # Will be constructed from username and repo name
 BRANCH="main"

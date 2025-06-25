@@ -2,7 +2,7 @@
 
 git:
   repository:
-    name: "ContentCreator"
+    name: "ContentCreator-0.1"
     username: ""  # Set your GitHub username here
     branch: "main"
     

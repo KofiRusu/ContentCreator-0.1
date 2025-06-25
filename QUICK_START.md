@@ -6,7 +6,7 @@ This guide will get you up and running with the automated git pipeline in under 
 
 - Git installed and configured
 - Python 3.8+ installed
-- GitHub account with ContentCreator repository created
+- GitHub account with ContentCreator-0.1 repository created
 
 ## Step-by-Step Setup
 
@@ -124,7 +124,7 @@ make git-auto USERNAME=yourusername MESSAGE="Your message"
 ```
 
 ### Common Error: "Remote repository not found"
-1. Make sure you've created the `ContentCreator` repository on GitHub
+1. Make sure you've created the `ContentCreator-0.1` repository on GitHub
 2. Check that your username is correct
 3. Verify the repository is public or you have access
 

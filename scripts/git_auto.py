@@ -25,7 +25,7 @@ class Colors:
 class GitPipeline:
     """Automated Git Pipeline for ContentCreator"""
     
-    def __init__(self, repo_name: str = "ContentCreator", username: str = ""):
+    def __init__(self, repo_name: str = "ContentCreator-0.1", username: str = ""):
         self.repo_name = repo_name
         self.username = username
         self.branch = "main"
