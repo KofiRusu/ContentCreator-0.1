@@ -1,0 +1,68 @@
+# ContentCreator Git Pipeline Configuration
+
+git:
+  repository:
+    name: "ContentCreator"
+    username: ""  # Set your GitHub username here
+    branch: "main"
+    
+  automation:
+    auto_commit: true
+    auto_push: true
+    run_tests_before_commit: false
+    force_push: false
+    
+  commit:
+    message_template: "Auto-commit: {changes} [{timestamp}]"
+    include_timestamp: true
+    
+  hooks:
+    pre_commit:
+      - "black src/"
+      - "isort src/"
+      - "flake8 src/"
+    
+    pre_push:
+      - "pytest src/tests/"
+      
+  ignore_patterns:
+    - "*.log"
+    - "temp/"
+    - "tmp/"
+    - "__pycache__/"
+    - ".pytest_cache/"
+    - "dist/"
+    - "build/"
+    
+pipeline:
+  stages:
+    - name: "format"
+      commands:
+        - "black src/"
+        - "isort src/"
+      
+    - name: "lint"
+      commands:
+        - "flake8 src/"
+        
+    - name: "test"
+      commands:
+        - "pytest src/tests/"
+        
+    - name: "security"
+      commands:
+        - "bandit -r src/"
+        - "safety check"
+        
+  notifications:
+    slack_webhook: ""  # Optional: Slack webhook for notifications
+    email: ""          # Optional: Email for notifications
+    
+github:
+  actions:
+    enabled: true
+    python_versions: ["3.8", "3.9", "3.10", "3.11"]
+    run_on_push: true
+    run_on_pr: true
+    auto_format: true
+    auto_release: true 

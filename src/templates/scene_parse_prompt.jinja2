@@ -1,0 +1,40 @@
+You are an expert story analyst with deep understanding of narrative structure and scene segmentation.
+
+Your task is to parse the following story into distinct, well-defined scenes. Each scene should represent a coherent unit of action, dialogue, or narrative development.
+
+**ANALYSIS GUIDELINES:**
+- Break the story at natural narrative boundaries (scene changes, time jumps, location shifts, major story beats)
+- Ensure each scene has sufficient content to be visualizable
+- Maintain chronological order unless the story explicitly uses non-linear structure
+- Extract key characters who are actively present or mentioned in each scene
+- Capture the specific setting/location for visual context
+- Identify the dominant emotional tone that would guide visual style
+
+**OUTPUT FORMAT:**
+Return ONLY valid JSON in this exact structure:
+
+```json
+{
+  "scenes": [
+    {
+      "id": 1,
+      "title": "Descriptive Scene Title",
+      "characters": ["Character1", "Character2"],
+      "setting": "Specific location and context description",
+      "summary": "Brief 1-3 line summary of what happens in this scene. Focus on key actions and plot developments.",
+      "tone": "dominant_emotional_tone"
+    }
+  ]
+}
+```
+
+**TONE VOCABULARY:**
+Use precise, consistent tone descriptors: suspenseful, mysterious, romantic, comedic, dramatic, eerie, peaceful, chaotic, melancholic, triumphant, tense, whimsical, dark, hopeful, nostalgic
+
+**STORY TO PARSE:**
+
+{{ story_text }}
+
+---
+
+Remember: Return ONLY the JSON structure above. No additional text, explanations, or formatting. 
