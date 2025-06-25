@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  ai-scene-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: contentcreator-pipeline
+    environment:
+      # Load environment variables from .env file
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FAL_API_KEY=${FAL_API_KEY}
+      - DEFAULT_VIDEO_BUDGET=${DEFAULT_VIDEO_BUDGET:-50.0}
+      - MAX_SCENES=${MAX_SCENES:-10}
+      - ASSETS_DIR=${ASSETS_DIR:-src/assets}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE:-false}
+    volumes:
+      # Mount source code for development (comment out for production)
+      - ./src:/app/src:ro
+      - ./config:/app/config:ro
+      
+      # Mount assets directory for persistent storage
+      - ./src/assets:/app/src/assets
+      
+      # Mount story files directory
+      - ./stories:/app/stories:ro
+    working_dir: /app
+    command: ["python", "-m", "src.main", "--help"]
+    
+    # Uncomment for interactive development
+    # stdin_open: true
+    # tty: true
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # Optional: Add a development service with different configuration
+  ai-scene-pipeline-dev:
+    extends: ai-scene-pipeline
+    container_name: contentcreator-pipeline-dev
+    environment:
+      - DEVELOPMENT_MODE=true
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      # Development mode: mount source as writable
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./src/assets:/app/src/assets
+      - ./stories:/app/stories
+    stdin_open: true
+    tty: true
+    profiles:
+      - dev
+
+volumes:
+  # Named volume for persistent asset storage in production
+  assets_data:
+    driver: local
+
+networks:
+  default:
+    name: contentcreator-network 
