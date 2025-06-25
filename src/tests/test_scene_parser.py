@@ -3,7 +3,7 @@ Unit tests for scene_parser.py module.
 """
 
 import json
-import os
+
 from unittest.mock import Mock, patch
 
 import pytest
@@ -165,7 +165,8 @@ class TestOpenAIAPI:
     def test_api_call_exception(self, mock_get_client):
         """Test API call that raises an exception."""
         mock_client = Mock()
-        mock_client.chat.completions.create.side_effect = Exception("API Error")
+        mock_client.chat.completions.create.side_effect = Exception(
+            "API Error")
         mock_get_client.return_value = mock_client
 
         result = call_openai_api("test prompt")
@@ -276,7 +277,7 @@ class TestParseWithMetadata:
 def sample_story_short():
     """Short story for testing."""
     return """
-    The old lighthouse keeper walked to the edge of the cliff. 
+    The old lighthouse keeper walked to the edge of the cliff.
     The storm was approaching, and he needed to light the beacon.
     As the first ships appeared on the horizon, he smiled with satisfaction.
     """
@@ -287,19 +288,19 @@ def sample_story_multi_scene():
     """Multi-scene story for testing."""
     return """
     Chapter 1: The Beginning
-    
+
     Sarah packed her bags hurriedly. The letter had arrived that morning,
-    and everything had changed. She looked around her small apartment one 
+    and everything had changed. She looked around her small apartment one
     last time before heading to the door.
-    
+
     Chapter 2: The Journey
-    
+
     The train station was crowded with commuters. Sarah clutched her ticket
     and searched for the right platform. An announcement echoed through
     the hall about delays, but she barely heard it.
-    
+
     Chapter 3: Arrival
-    
+
     The countryside rolled past the window as Sarah dozed. When she woke,
     the train was pulling into a small station she'd never seen before.
     This was it - her new beginning.

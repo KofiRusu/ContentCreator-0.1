@@ -5,16 +5,17 @@ Unit tests for image_gen.py module.
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, mock_open, patch
+
 import pytest
 import requests
 
 from src.pipeline.image_gen import (
+    cleanup_generated_images,
     construct_image_prompt,
     download_image,
-    generate_scene_image,
     generate_batch_images,
-    cleanup_generated_images,
+    generate_scene_image,
     get_openai_client,
 )
 from src.pipeline.scene_parser import Scene
@@ -115,7 +116,8 @@ class TestImageDownload:
 
             # Mock file operations
             with patch("builtins.open", mock_open()) as mock_file:
-                result = download_image("http://example.com/image.png", file_path)
+                result = download_image(
+                    "http://example.com/image.png", file_path)
 
                 assert result is True
                 mock_get.assert_called_once_with(
@@ -146,7 +148,8 @@ class TestImageDownload:
             file_path = Path(temp_dir) / "test_image.png"
 
             with patch("builtins.open", side_effect=IOError("Write error")):
-                result = download_image("http://example.com/image.png", file_path)
+                result = download_image(
+                    "http://example.com/image.png", file_path)
 
                 assert result is False
 
@@ -256,7 +259,8 @@ class TestImageGeneration:
 
     @patch("src.pipeline.image_gen.get_openai_client")
     @patch("src.pipeline.image_gen.time.sleep")
-    def test_image_generation_rate_limit_retry(self, mock_sleep, mock_get_client):
+    def test_image_generation_rate_limit_retry(
+            self, mock_sleep, mock_get_client):
         """Test image generation with rate limit and retry."""
         import openai
 
@@ -267,7 +271,10 @@ class TestImageGeneration:
         mock_response.data[0].url = "http://example.com/image.png"
 
         mock_client.images.generate.side_effect = [
-            openai.RateLimitError("Rate limit exceeded", response=Mock(), body=None),
+            openai.RateLimitError(
+                "Rate limit exceeded",
+                response=Mock(),
+                body=None),
             mock_response,
         ]
         mock_get_client.return_value = mock_client
@@ -281,7 +288,8 @@ class TestImageGeneration:
 
     @patch("src.pipeline.image_gen.get_openai_client")
     @patch("src.pipeline.image_gen.download_image")
-    def test_image_generation_download_failure(self, mock_download, mock_get_client):
+    def test_image_generation_download_failure(
+            self, mock_download, mock_get_client):
         """Test image generation with download failure."""
         mock_client = Mock()
         mock_response = Mock()
@@ -505,4 +513,4 @@ class TestIntegration:
         expected_path = assets_dir / f"scene_{sample_scene.id}.png"
 
         assert expected_path.name == "scene_1.png"
-        assert "assets" in str(expected_path) 
+        assert "assets" in str(expected_path)

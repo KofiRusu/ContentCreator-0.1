@@ -38,13 +38,17 @@ class Scene(BaseModel):
     """Pydantic model for a single scene."""
 
     id: int = Field(..., description="Scene number/identifier")
-    title: str = Field(..., max_length=100, description="Short descriptive title")
+    title: str = Field(..., max_length=100,
+                       description="Short descriptive title")
     characters: List[str] = Field(
         default_factory=list, description="List of character names"
     )
-    setting: str = Field(..., max_length=200, description="Location and context")
-    summary: str = Field(..., max_length=500, description="1-3 line plot summary")
-    tone: str = Field(..., max_length=50, description="Emotional tone or style")
+    setting: str = Field(..., max_length=200,
+                         description="Location and context")
+    summary: str = Field(..., max_length=500,
+                         description="1-3 line plot summary")
+    tone: str = Field(..., max_length=50,
+                      description="Emotional tone or style")
 
 
 class SceneParseResult(BaseModel):
@@ -111,7 +115,8 @@ def call_openai_api(prompt: str, max_retries: int = 1) -> Optional[dict]:
 
     for attempt in range(max_retries + 1):
         try:
-            logger.info(f"Calling OpenAI API (attempt {attempt + 1}/{max_retries + 1})")
+            logger.info(
+                f"Calling OpenAI API (attempt {attempt + 1}/{max_retries + 1})")
 
             response = client.chat.completions.create(
                 model="gpt-4o",
@@ -141,7 +146,9 @@ def call_openai_api(prompt: str, max_retries: int = 1) -> Optional[dict]:
                 return None
 
         except Exception as e:
-            logger.error(f"OpenAI API call failed (attempt {attempt + 1}): {e}")
+            logger.error(
+                f"OpenAI API call failed (attempt {
+                    attempt + 1}): {e}")
             if attempt < max_retries:
                 continue
             return None
@@ -228,15 +235,15 @@ def parse_scenes_with_metadata(story_text: str) -> SceneParseResult:
 if __name__ == "__main__":
     # Test with a sample story
     sample_story = """
-    The forest was eerily quiet as Lena stepped through the undergrowth. 
+    The forest was eerily quiet as Lena stepped through the undergrowth.
     Shadows danced between the trees, and she could feel eyes watching her.
-    
-    Suddenly, a figure emerged from behind an ancient oak. The stranger wore 
-    a dark cloak and spoke in riddles about the path ahead. "Not all who 
-    wander are lost," he said cryptically, "but some are exactly where they 
+
+    Suddenly, a figure emerged from behind an ancient oak. The stranger wore
+    a dark cloak and spoke in riddles about the path ahead. "Not all who
+    wander are lost," he said cryptically, "but some are exactly where they
     need to be."
-    
-    Lena felt a chill run down her spine. She knew this encounter would 
+
+    Lena felt a chill run down her spine. She knew this encounter would
     change everything.
     """
 
