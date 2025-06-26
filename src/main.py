@@ -775,7 +775,7 @@ def generate_all(
                         f"[green]✅ Successfully generated for scene {scene.id}[/green]")
             except Exception as e:
                 video_results[scene.id] = None
-                rprint(f"[red]❌ Failed for scene {scene.id}[/red]")
+                rprint(f"[red]❌ Failed for scene {scene.id}: {e}[/red]")
 
         # Final summary
         successful_videos = sum(
