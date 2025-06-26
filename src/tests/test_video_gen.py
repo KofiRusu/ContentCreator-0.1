@@ -32,7 +32,8 @@ def sample_scene():
         id=1,
         title="Forest Encounter",
         characters=["Lena", "Mysterious Stranger"],
-        setting="Dark forest with ancient oak trees, moonlight filtering through leaves",
+        setting="Dark forest with ancient oak trees,
+            moonlight filtering through leaves",
         summary="Lena walks cautiously through the eerie forest when a cloaked stranger emerges from the shadows and speaks in riddles about her destiny",
         tone="mysterious, suspenseful, atmospheric"
     )
@@ -285,8 +286,6 @@ class TestFileOperations:
     def test_assets_directory_creation(self):
         """Test that assets directory is created automatically."""
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_assets = Path(temp_dir) / "test_assets"
-
             # Mock the assets directory path
             with patch('src.pipeline.video_gen.Path') as mock_path:
                 mock_path.return_value.parent.parent.resolve.return_value = Path(

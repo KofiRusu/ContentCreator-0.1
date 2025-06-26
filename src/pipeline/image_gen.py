@@ -216,7 +216,8 @@ def generate_batch_images(
         max_concurrent (int): Maximum concurrent requests (basic rate limiting)
 
     Returns:
-        dict[int, Optional[str]]: Mapping of scene ID to image path (or None if failed)
+        dict[int,
+            Optional[str]]: Mapping of scene ID to image path (or None if failed)
     """
 
     results = {}

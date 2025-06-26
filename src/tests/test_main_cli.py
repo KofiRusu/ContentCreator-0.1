@@ -119,7 +119,9 @@ class TestGenerateMediaCommand:
 
     @patch('src.main.generate_scene_image')
     @patch('src.main.parse_scenes')
-    def test_generate_media_with_verbose(self, mock_parse_scenes, mock_generate_image,
+    def test_generate_media_with_verbose(self,
+        mock_parse_scenes,
+        mock_generate_image,
                                          runner, mock_scenes, temp_story_file):
         """Test generate-media with verbose output."""
         mock_parse_scenes.return_value = [
@@ -153,8 +155,13 @@ class TestGenerateMediaCommand:
     @patch('src.main.check_existing_assets')
     @patch('src.main.generate_scene_image')
     @patch('src.main.parse_scenes')
-    def test_generate_media_skip_existing(self, mock_parse_scenes, mock_generate_image,
-                                          mock_check_assets, runner, mock_scenes, temp_story_file):
+    def test_generate_media_skip_existing(self,
+        mock_parse_scenes,
+        mock_generate_image,
+                                          mock_check_assets,
+                                              runner,
+                                              mock_scenes,
+                                              temp_story_file):
         """Test generate-media with existing asset skipping."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes]
@@ -190,8 +197,12 @@ class TestGenerateMediaCommand:
 
     @patch('src.main.generate_scene_image')
     @patch('src.main.parse_scenes')
-    def test_generate_media_image_generation_failure(self, mock_parse_scenes, mock_generate_image,
-                                                     runner, mock_scenes, temp_story_file):
+    def test_generate_media_image_generation_failure(self,
+        mock_parse_scenes,
+        mock_generate_image,
+                                                     runner,
+                                                         mock_scenes,
+                                                         temp_story_file):
         """Test generate-media when some image generations fail."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes[:2]]
@@ -233,8 +244,12 @@ class TestGenerateVideosCommand:
 
     @patch('src.main.VideoGenerator')
     @patch('src.main.parse_scenes')
-    def test_generate_videos_with_budget_warning(self, mock_parse_scenes, mock_video_generator,
-                                                 runner, mock_scenes, temp_story_file):
+    def test_generate_videos_with_budget_warning(self,
+        mock_parse_scenes,
+        mock_video_generator,
+                                                 runner,
+                                                     mock_scenes,
+                                                     temp_story_file):
         """Test generate-videos shows budget warning in production mode."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes]
@@ -250,8 +265,13 @@ class TestGenerateVideosCommand:
     @patch('src.main.check_existing_assets')
     @patch('src.main.VideoGenerator')
     @patch('src.main.parse_scenes')
-    def test_generate_videos_with_images(self, mock_parse_scenes, mock_video_generator,
-                                         mock_check_assets, runner, mock_scenes, temp_story_file):
+    def test_generate_videos_with_images(self,
+        mock_parse_scenes,
+        mock_video_generator,
+                                         mock_check_assets,
+                                             runner,
+                                             mock_scenes,
+                                             temp_story_file):
         """Test generate-videos using existing images as references."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes]
@@ -281,7 +301,10 @@ class TestGenerateAllCommand:
     @patch('src.main.generate_scene_image')
     @patch('src.main.parse_scenes')
     def test_generate_all_success(self, mock_parse_scenes, mock_generate_image,
-                                  mock_video_generator, runner, mock_scenes, temp_story_file):
+                                  mock_video_generator,
+                                      runner,
+                                      mock_scenes,
+                                      temp_story_file):
         """Test complete generate-all pipeline."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes]
@@ -308,8 +331,12 @@ class TestGenerateAllCommand:
 
     @patch('src.main.generate_scene_image')
     @patch('src.main.parse_scenes')
-    def test_generate_all_image_failure_continue(self, mock_parse_scenes, mock_generate_image,
-                                                 runner, mock_scenes, temp_story_file):
+    def test_generate_all_image_failure_continue(self,
+        mock_parse_scenes,
+        mock_generate_image,
+                                                 runner,
+                                                     mock_scenes,
+                                                     temp_story_file):
         """Test generate-all continues after image generation failures."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes]
@@ -459,7 +486,10 @@ class TestAssetManagement:
     @patch('src.main.generate_scene_image')
     @patch('src.main.parse_scenes')
     def test_asset_directory_display(self, mock_parse_scenes, mock_generate_image,
-                                     mock_check_assets, runner, mock_scenes, temp_story_file):
+                                     mock_check_assets,
+                                         runner,
+                                         mock_scenes,
+                                         temp_story_file):
         """Test that assets directory is properly displayed."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes]
@@ -473,7 +503,12 @@ class TestAssetManagement:
     @patch('src.main.check_existing_assets')
     @patch('src.main.parse_scenes')
     def test_overwrite_mode(
-            self, mock_parse_scenes, mock_check_assets, runner, mock_scenes, temp_story_file):
+            self,
+                mock_parse_scenes,
+                mock_check_assets,
+                runner,
+                mock_scenes,
+                temp_story_file):
         """Test overwrite mode ignores existing assets."""
         mock_parse_scenes.return_value = [
             scene.model_dump() for scene in mock_scenes]
@@ -499,7 +534,10 @@ class TestCLIIntegration:
     @patch('src.main.generate_scene_image')
     @patch('src.main.parse_scenes')
     def test_complete_workflow_dry_run(self, mock_parse_scenes, mock_generate_image,
-                                       mock_video_generator, runner, mock_scenes, temp_story_file):
+                                       mock_video_generator,
+                                           runner,
+                                           mock_scenes,
+                                           temp_story_file):
         """Test complete workflow from story to videos in dry run mode."""
         # Setup all mocks
         mock_parse_scenes.return_value = [

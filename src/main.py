@@ -138,22 +138,22 @@ def create_summary_table(
     for scene in scenes:
         scene_id = scene.id
 
-        # Determine status
-        if existing_assets.get(scene_id, False):
-            status = "⚠️ Skipped (exists)"
+        # Determine status from results
+        if results.get(scene_id) == "skipped":
+            status_text = "⚠️ Skipped"
             status_style = "yellow"
         elif results.get(scene_id):
-            status = "✅ Generated"
+            status_text = "✅ Generated"
             status_style = "green"
         else:
-            status = "❌ Failed"
+            status_text = "❌ Failed"
             status_style = "red"
 
         # Prepare row data
         row_data = [
             str(scene_id),
             scene.title[:27] + "..." if len(scene.title) > 30 else scene.title,
-            "[{status_style}]{status}[/{status_style}]"
+            f"[{status_style}]{status_text}[/{status_style}]"
         ]
 
         if verbose:
@@ -332,7 +332,7 @@ def generate_media(
         console.print(summary_table)
 
         # Display statistics
-        rprint(f"\n[cyan]📊 Statistics:[/cyan]")
+        rprint("\n[cyan]📊 Statistics:[/cyan]")
         rprint(f"  • Total scenes: [bold]{len(scenes)}[/bold]")
         rprint(f"  • Generated: [green]{successful_generations}[/green]")
         if skipped_count > 0:
@@ -350,15 +350,15 @@ def generate_media(
             raise typer.Exit(1)
 
     except FileNotFoundError as e:
-        rprint("[red]❌ File Error: {e}[/red]")
+        rprint(f"[red]❌ File Error: {e}[/red]")
         raise typer.Exit(1)
     except UnicodeDecodeError as e:
-        rprint("[red]❌ Encoding Error: {e}[/red]")
+        rprint(f"[red]❌ Encoding Error: {e}[/red]")
         rprint(
             "[yellow]💡 Tip: Ensure your file is saved with UTF-8 encoding.[/yellow]")
         raise typer.Exit(1)
     except Exception as e:
-        rprint("[red]❌ Unexpected Error: {e}[/red]")
+        rprint(f"[red]❌ Pipeline error: {e}[/red]")
         if verbose:
             logger.exception("Unexpected error in generate-media command")
         raise typer.Exit(1)
@@ -471,7 +471,7 @@ def generate_videos(
             existing_images = check_existing_assets(scene_objects, "image")
             image_count = sum(existing_images.values())
             rprint(
-                "[cyan]🖼️  Found {image_count} existing images to use as references[/cyan]")
+                f"[cyan]🖼️  Found {image_count} existing images to use as references[/cyan]")
 
         # Initialize video generator
         video_generator = VideoGenerator(
@@ -483,7 +483,7 @@ def generate_videos(
         # Generate videos
         mode_text = "DRY RUN" if dry_run else "SIMULATE" if simulate else "PRODUCTION"
         rprint(
-            "[cyan]🎬 Generating videos with fal.ai Veo 3 ({mode_text} mode)...[/cyan]")
+            f"[cyan]🎬 Generating videos with fal.ai Veo 3 ({mode_text} mode)...[/cyan]")
 
         results = {}
 
@@ -578,7 +578,7 @@ def generate_videos(
         console.print(summary_table)
 
         # Display statistics
-        rprint(f"\n[cyan]📊 Statistics:[/cyan]")
+        rprint("\n[cyan]📊 Statistics:[/cyan]")
         rprint(f"  • Total scenes: [bold]{len(scenes)}[/bold]")
         rprint(f"  • Generated: [green]{successful_generations}[/green]")
         if skipped_count > 0:
@@ -588,7 +588,7 @@ def generate_videos(
 
         # Display cost information
         if not dry_run:
-            rprint(f"\n[cyan]💰 Cost Summary:[/cyan]")
+            rprint("\n[cyan]💰 Cost Summary:[/cyan]")
             rprint(
                 f"  • Total cost: [bold]${
                     final_summary['total_cost']:.2f}[/bold]")
@@ -606,12 +606,12 @@ def generate_videos(
 
         if failed_count > 0:
             rprint(
-                f"\n[yellow]💡 Tip: Check your FAL_KEY and rate limits if generations failed.[/yellow]")
+                "\n[yellow]💡 Tip: Check your FAL_KEY and rate limits if generations failed.[/yellow]")
             if not dry_run and not simulate:
                 raise typer.Exit(1)
 
     except Exception as e:
-        rprint("[red]❌ Unexpected Error: {e}[/red]")
+        rprint(f"[red]❌ Unexpected Error: {e}[/red]")
         if verbose:
             logger.exception("Unexpected error in generate-videos command")
         raise typer.Exit(1)
@@ -645,7 +645,8 @@ def generate_all(
     This runs the complete pipeline: scene parsing → image generation → video generation.
     """
 
-    rprint("[bold cyan]🚀 Starting Complete AI Scene-to-Video Pipeline[/bold cyan]")
+    rprint(
+        "[bold cyan]🚀 Starting Complete AI Scene-to-Video Pipeline[/bold cyan]")
 
     # Configure logging level based on verbose flag
     if verbose:
@@ -680,7 +681,8 @@ def generate_all(
             scenes = parse_scenes(story_content)
 
             if not scenes:
-                rprint("[red]❌ No scenes could be parsed from the story.[/red]")
+                rprint(
+                    "[red]❌ No scenes could be parsed from the story.[/red]")
                 raise typer.Exit(1)
 
             # Convert scene dictionaries to Scene objects
@@ -721,7 +723,7 @@ def generate_all(
                 "[green]✅ Images complete: {successful_images}/{len(scene_objects)} generated[/green]")
 
         except Exception as e:
-            rprint("[red]❌ Image generation failed: {e}[/red]")
+            rprint(f"[red]❌ Image generation failed: {e}[/red]")
             if not typer.confirm(
                     "Continue with video generation despite image failures?"):
                 raise typer.Exit(1)
@@ -770,11 +772,10 @@ def generate_all(
                 video_results[scene.id] = video_path
                 if video_path:
                     rprint(
-                        f"[green]✅ Video generated for scene {
-                            scene.id}[/green]")
+                        f"[green]✅ Successfully generated for scene {scene.id}[/green]")
             except Exception as e:
                 video_results[scene.id] = None
-                rprint("[red]❌ Video failed for scene {scene.id}: {e}[/red]")
+                rprint(f"[red]❌ Failed for scene {scene.id}[/red]")
 
         # Final summary
         successful_videos = sum(
@@ -798,7 +799,7 @@ def generate_all(
             f"\n[cyan]📁 All assets saved to:[/cyan] {assets_dir.absolute()}")
 
     except Exception as e:
-        rprint("[red]❌ Pipeline error: {e}[/red]")
+        rprint(f"[red]❌ Pipeline error: {e}[/red]")
         if verbose:
             logger.exception("Unexpected error in generate-all command")
         raise typer.Exit(1)
@@ -840,38 +841,30 @@ def test_pipeline():
                 rprint(f"  [cyan]Scene {scene.id}:[/cyan] {scene.title}")
 
             # Test video generation (dry run)
-            rprint("\n[cyan]🎬 Testing video generation (dry run mode)...[/cyan]")
+            rprint(
+                "\n[cyan]🎬 Testing video generation (dry run mode)...[/cyan]")
 
             video_generator = VideoGenerator(dry_run=True, budget_limit=10.0)
+            scene_objects = [Scene(**scene) for scene in scenes]
 
-            for scene in scenes[:2]:  # Test first 2 scenes only
-                try:
-                    video_path = video_generator.generate_scene_video(scene)
-                    if video_path:
-                        rprint(
-                            f"[green]✅ Mock video generated for scene {
-                                scene.id}[/green]")
-                        rprint(f"     [dim]Path: {video_path}[/dim]")
-                    else:
-                        rprint(
-                            f"[yellow]⚠️ Video generation returned None for scene {
-                                scene.id}[/yellow]")
-                except Exception as e:
-                    rprint(
-                        f"[red]❌ Video generation error for scene {
-                            scene.id}: {e}[/red]")
-
-            # Show session summary
+            video_path = video_generator.generate_scene_video(scene_objects[0])
             summary = video_generator.get_session_summary()
-            rprint(f"\n[cyan]📊 Video Generation Test Summary:[/cyan]")
+
+            rprint("\n[cyan]📊 Video Generation Test Summary:[/cyan]")
             rprint(f"  • Videos generated: {summary['videos_generated']}")
             rprint(f"  • Mock total cost: ${summary['total_cost']:.2f}")
             rprint(f"  • Budget remaining: ${summary['budget_remaining']:.2f}")
 
+            if video_path:
+                rprint("[green]✅ Mock video generation successful[/green]")
+            else:
+                rprint("[yellow]⚠️ Mock video generation failed[/yellow]")
+
         else:
             rprint(
                 "[yellow]⚠️ Scene parsing returned empty results (API key needed)[/yellow]")
-            rprint("[cyan]🎬 Testing video generation with mock scene...[/cyan]")
+            rprint(
+                "[cyan]🎬 Testing video generation with mock scene...[/cyan]")
 
             # Create mock scene for video testing
             mock_scene = Scene(
@@ -891,7 +884,7 @@ def test_pipeline():
             else:
                 rprint("[yellow]⚠️ Mock video generation failed[/yellow]")
 
-        rprint(f"\n[green]✅ Pipeline test complete![/green]")
+        rprint("\n[green]✅ Pipeline test complete![/green]")
         rprint("[cyan]💡 Ready for production use with proper API keys![/cyan]")
 
     except Exception as e:
